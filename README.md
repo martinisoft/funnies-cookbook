@@ -1,4 +1,4 @@
-# funnies-cookbook cookbook
+# funnies cookbook
 
 # Requirements
 
@@ -7,6 +7,8 @@
 # Attributes
 
 # Recipes
+
+* default - Installs, configures or deploys funnies
 
 # Author
 

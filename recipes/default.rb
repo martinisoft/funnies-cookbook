@@ -16,3 +16,14 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
+
+application "funnies" do
+  path "/srv/funnies"
+  owner "funnies"
+  group "funnies"
+
+  repository "https://github.com/martinisoft/funnies.git"
+  revision "master"
+
+  environment Chef::EncryptedDataBagItem.load("funnies", "env")
+end

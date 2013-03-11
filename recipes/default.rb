@@ -17,6 +17,8 @@
 # limitations under the License.
 #
 
+include_recipe "git::default"
+
 env_vars = begin
              Chef::EncryptedDataBagItem.load("funnies", "env")
            rescue => ex
@@ -27,10 +29,6 @@ env_vars = begin
              end
              {}
            end
-
-package "git-core" do
-  action :install
-end
 
 user "funnies" do
   comment "Funnies application"

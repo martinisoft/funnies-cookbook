@@ -17,7 +17,7 @@ First get your bundle installed with ```bundle install```
 
 # Running tests
 
-Make sure you have (Vagrant)[http://www.vagrantup.com/] installed on your system
+Make sure you have [Vagrant](http://www.vagrantup.com/) installed on your system
 
 Simply run ```kitchen test```
 

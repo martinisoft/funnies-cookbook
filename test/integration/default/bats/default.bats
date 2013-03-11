@@ -1,5 +1,9 @@
 #!/usr/bin/env bats
 
-@test "should have deployment directory" {
+@test "has deployment directory" {
   [ -d "/srv/funnies" ]
+}
+
+@test "does not have extra home directory" {
+  [ ! -d "/home/funnies" ]
 }

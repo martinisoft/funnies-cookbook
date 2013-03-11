@@ -17,6 +17,28 @@
 # limitations under the License.
 #
 
+env_vars = begin
+             Chef::EncryptedDataBagItem.load("funnies", "env")
+           rescue => ex
+             if ex.class == Errno::ENOENT
+               Chef::Log.warn("Could not decrypt data bag! (#{ex})")
+             else
+               Chef::Log.warn("Data bag 'funnies' not found, please create it")
+             end
+             {}
+           end
+
+package "git-core" do
+  action :install
+end
+
+user "funnies" do
+  comment "Funnies application"
+  shell "/bin/bash"
+  home "/srv/funnies"
+  manage_home true
+end
+
 application "funnies" do
   path "/srv/funnies"
   owner "funnies"
@@ -25,5 +47,5 @@ application "funnies" do
   repository "https://github.com/martinisoft/funnies.git"
   revision "master"
 
-  environment Chef::EncryptedDataBagItem.load("funnies", "env")
+  environment env_vars
 end

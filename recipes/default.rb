@@ -95,6 +95,20 @@ file "#{rvm_prefix}/.rvm/.rvmrc" do
   group "funnies"
 end
 
+rvm_shell "install_ruby" do
+  user "funnies"
+  group "funnies"
+  cwd "/srv/funnies"
+  code %{rvm install 1.9.3-p327 --patch falcon-gc}
+end
+
+rvm_shell "default_ruby" do
+  user "funnies"
+  group "funnies"
+  cwd "/srv/funnies"
+  code %{rvm use 1.9.3-p327 --default}
+end
+
 application "funnies" do
   path "/srv/funnies"
   owner "funnies"

@@ -11,3 +11,7 @@
 @test "installs rvm" {
   [ "type rvm | cat | head -1 | grep -q '^rvm is a function$'" ]
 }
+
+@test "installs and defaults a ruby" {
+  [ "ruby -v | grep -q '1.9.3p327'" ]
+}

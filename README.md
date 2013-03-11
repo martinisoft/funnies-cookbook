@@ -11,13 +11,23 @@ An application cookbook to deploy the [funnies](https://github.com/martinisoft/f
 
 Include the funnies recipe in your node run list
 
+# Getting Started
+
+First get your bundle installed with ```bundle install```
+
+# Running tests
+
+Make sure you have (Vagrant)[http://www.vagrantup.com/] installed on your system
+
+Simply run ```kitchen test```
+
 # Attributes
 
 None
 
 # Recipes
 
-* default - Installs, configures and deploys funnies
+* default - Installs dependcies and deploys funnies
 
 # License and Author
 

@@ -10,3 +10,5 @@ depends 'application', '2.0.0'
 depends 'build-essential'
 depends 'git'
 depends 'rvm'
+
+supports 'ubuntu', '>= 12.04'

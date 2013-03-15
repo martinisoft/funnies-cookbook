@@ -91,22 +91,18 @@ install_rvm     rvm_prefix: rvm_prefix,
                 user: "funnies"
 
 # Reset permissions on the rvmrc file
-file "#{rvm_prefix}/.rvm/.rvmrc" do
+file "#{rvm_prefix}/.rvmrc" do
   group "funnies"
 end
 
-rvm_shell "install_ruby" do
+rvm_ruby "1.9.3-p327" do
+  action :install
   user "funnies"
-  group "funnies"
-  cwd "/srv/funnies"
-  code %{rvm install 1.9.3-p327 --patch falcon-gc}
+  patch "falcon-gc"
 end
 
-rvm_shell "default_ruby" do
+rvm_default_ruby "1.9.3-p327" do
   user "funnies"
-  group "funnies"
-  cwd "/srv/funnies"
-  code %{rvm use 1.9.3-p327 --default}
 end
 
 application "funnies" do

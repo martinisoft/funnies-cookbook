@@ -1,35 +1,38 @@
-# funnies cookbook
+funnies cookbook
+================
 
 An application cookbook to deploy the [funnies](https://github.com/martinisoft/funnies) web application
 
-# Requirements
+### Requirements
 
 * ubuntu 12.04
-* chef 11.2.0
+* chef 11.4.0
 
-# Usage
+### Usage
 
 Include the funnies recipe in your node run list
 
-# Getting Started
+### Getting Started
 
 First get your bundle installed with ```bundle install```
 
-# Running tests
+### Testing
 
-Make sure you have [Vagrant](http://www.vagrantup.com/) installed on your system
+After you complete your ```bundle install```
 
-Simply run ```kitchen test```
+Make sure you have [Vagrant](http://www.vagrantup.com/) 1.2 or newer installed on your system
 
-# Attributes
+Then just run ```kitchen test``` and watch your CPU burn
+
+### Attributes
 
 None
 
-# Recipes
+### Recipes
 
 * default - Installs dependcies and deploys funnies
 
-# License and Author
+### License and Author
 
 Author:: Aaron Kalin (<akalin@martinisoftware.com>)
 

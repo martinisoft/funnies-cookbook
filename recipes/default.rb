@@ -95,6 +95,28 @@ rvm_default_ruby ruby_version do
   user "funnies"
 end
 
+# Setup application directories
+app_dirs = [
+  '/srv/funnies/shared/config',
+  '/srv/funnies/shared/log',
+  '/srv/funnies/shared/sessions',
+  '/srv/funnies/shared/sockets',
+  '/srv/funnies/shared/system',
+  '/srv/funnies/shared/pids'
+]
+
+app_dirs.each do |dir|
+  directory dir do
+    owner       'funnies'
+    group       'funnies'
+    mode        '2775'
+    recursive   true
+  end
+end
+
+# Setup database config
+env_vars['DATABASE_URL'] ||= node['funnies']['default_database_url']
+
 # Setup funnies application, clone the repo
 application "funnies" do
   path "/srv/funnies"
@@ -104,5 +126,17 @@ application "funnies" do
   repository "https://github.com/martinisoft/funnies.git"
   revision "master"
 
+  symlink_before_migrate.clear
+  create_dirs_before_symlink   %w{tmp}
+  purge_before_symlink.clear
+  symlinks({
+             "system" => "public/system",
+             "pids" => "tmp/pids",
+             "sessions" => "tmp/sessions",
+             "sockets" => "tmp/sockets",
+             "log" => "log"
+           })
+
   environment env_vars
 end
+

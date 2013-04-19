@@ -15,3 +15,4 @@
 @test "installs and defaults a ruby" {
   [ "ruby -v | grep -q '1.9.3p327'" ]
 }
+

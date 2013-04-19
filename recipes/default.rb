@@ -32,6 +32,7 @@ env_vars = begin
              {}
            end
 
+# Setup funnies user
 user "funnies" do
   comment "Funnies application"
   shell "/bin/bash"
@@ -39,34 +40,9 @@ user "funnies" do
   manage_home true
 end
 
-# Prerequisites for RVM
-rvm_packages = [
-  "sed",
-  "grep",
-  "gzip",
-  "bzip2",
-  "curl",
-  "libcurl4-openssl-dev",
-  "libreadline6",
-  "libreadline6-dev",
-  "zlib1g",
-  "zlib1g-dev",
-  "libssl-dev",
-  "libyaml-dev",
-  "libsqlite3-dev",
-  "libxml2-dev",
-  "libxslt-dev",
-  "libc6-dev",
-  "ncurses-dev",
-  "automake",
-  "libtool",
-  "pkg-config"
-]
-
-rvm_packages.each do |pkg|
-  package pkg do
-    action :install
-  end
+# Does not come with build-essential in Ubuntu
+package 'curl' do
+  action :install
 end
 
 rvmrc = {
@@ -75,36 +51,51 @@ rvmrc = {
   'rvm_trust_rvmrcs_flag'         => 1
 }
 
-script_flags      = "-s stable"
+script_flags      = '-s stable'
 installer_url     = node['rvm']['installer_url']
-rvm_prefix        = "/srv/funnies"
-rvm_gem_options   = "--no-rdoc --no-ri"
+rvm_prefix        = '/srv/funnies'
+rvm_gem_options   = '--no-rdoc --no-ri'
+ruby_version      = '1.9.3-p327'
+deploy_user_home  = File.join('/', 'srv', 'funnies')
 
 rvmrc_template  rvm_prefix: rvm_prefix,
                 rvm_gem_options: rvm_gem_options,
                 rvmrc: rvmrc,
-                user: "funnies"
+                user: 'funnies'
+
 
 install_rvm     rvm_prefix: rvm_prefix,
                 installer_url: installer_url,
                 script_flags: script_flags,
-                user: "funnies"
+                user: 'funnies'
 
 # Reset permissions on the rvmrc file
 file "#{rvm_prefix}/.rvmrc" do
   group "funnies"
 end
 
-rvm_ruby "1.9.3-p327" do
-  action :install
-  user "funnies"
-  patch "falcon-gc"
+# Running this to resolve dependencies and install ruby at the same time
+# This command is already idempotent because RVM will not reinstall an
+# existing ruby unless explicitly told to reinstall
+execute "install_rvm_ruby_#{ruby_version}" do
+  user 'root'
+  environment "HOME" => deploy_user_home
+  command "#{deploy_user_home}/.rvm/bin/rvm install #{ruby_version} --patch falcon-gc --autolibs=4"
 end
 
-rvm_default_ruby "1.9.3-p327" do
+# Does not use autolibs yet, WIP
+# rvm_ruby ruby_version do
+#   action :install
+#   user "funnies"
+#   # patch "falcon-gc"
+# end
+
+# Set default ruby version
+rvm_default_ruby ruby_version do
   user "funnies"
 end
 
+# Setup funnies application, clone the repo
 application "funnies" do
   path "/srv/funnies"
   owner "funnies"

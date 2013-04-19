@@ -7,10 +7,21 @@ An application cookbook to deploy the [funnies](https://github.com/martinisoft/f
 
 * ubuntu 12.04
 * chef 11.4.0
+* encrypted data bag
 
-### Usage
+### Usage & Setup
 
 Include the funnies recipe in your node run list
+
+Then setup an encrypted data bag with the 'env' item. The database
+is setup via the DATABASE_URL key in your 'env' data bag. For example:
+
+```
+postgres://funnies@localhost/production_db?pool=5
+```
+
+Will setup the funnies user with localhost and point to production_db
+with a pool of 5 connections.
 
 ### Getting Started
 

@@ -127,15 +127,15 @@ application "funnies" do
   revision "master"
 
   symlink_before_migrate.clear
-  create_dirs_before_symlink   %w{tmp}
+  create_dirs_before_symlink %w{tmp}
   purge_before_symlink.clear
   symlinks({
-             "system" => "public/system",
-             "pids" => "tmp/pids",
-             "sessions" => "tmp/sessions",
-             "sockets" => "tmp/sockets",
-             "log" => "log"
-           })
+    "system" => "public/system",
+    "pids" => "tmp/pids",
+    "sessions" => "tmp/sessions",
+    "sockets" => "tmp/sockets",
+    "log" => "log"
+  })
 
   environment env_vars
 end

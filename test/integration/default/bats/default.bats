@@ -16,3 +16,7 @@
   [ "ruby -v | grep -q '1.9.3p327'" ]
 }
 
+@test "sets up the environment file" {
+  [ -f "/srv/funnies/shared/env" ]
+}
+

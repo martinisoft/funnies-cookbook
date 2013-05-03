@@ -140,3 +140,12 @@ application "funnies" do
   environment env_vars
 end
 
+# Setup environment variables file
+template '/srv/funnies/shared/env' do
+  source  'env.erb'
+  owner   'funnies'
+  group   'funnies'
+  mode    '0664'
+  variables({ env_vars: env_vars })
+end
+

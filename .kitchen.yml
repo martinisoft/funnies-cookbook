@@ -6,10 +6,11 @@ platforms:
     box: opscode-ubuntu-12.04
     box_url: https://opscode-vm.s3.amazonaws.com/vagrant/opscode_ubuntu-12.04_chef-11.2.0.box
     require_chef_omnibus: true
-    require_chef_omnibus: 11.4.0
+    require_chef_omnibus: 11.4.4
     customize:
       memory: 1024
       cpus: 2
+
 suites:
 - name: default
   run_list:

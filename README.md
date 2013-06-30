@@ -13,14 +13,15 @@ An application cookbook to deploy the [funnies](https://github.com/martinisoft/f
 
 Include the funnies recipe in your node run list
 
-Then setup an encrypted data bag with the 'env' item. The database
-is setup via the DATABASE_URL key in your 'env' data bag. For example:
+Then setup an encrypted data bag called 'funnies' with the 'env' item. The
+database is setup via the DATABASE\_URL key in your 'env' data bag. For
+example:
 
 ```
 postgres://funnies@localhost/production_db?pool=5
 ```
 
-Will setup the funnies user with localhost and point to production_db
+Will setup the funnies user with localhost and point to production\_db
 with a pool of 5 connections.
 
 ### Getting Started
@@ -37,7 +38,9 @@ Then just run ```kitchen test``` and watch your CPU burn
 
 ### Attributes
 
-None
+* ```default['funnies']['default_database_url']``` - The default database URL if one is not provided
+* ```default['funnies']['revision']``` - Revision to deploy (default is 'master')
+* ```default['funnies']['migrate']``` - Wether to run migrations (default is 'false')
 
 ### Recipes
 

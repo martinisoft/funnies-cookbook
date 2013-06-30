@@ -138,7 +138,42 @@ application "funnies" do
   })
 
   environment env_vars
+  keep_releases 2
+  migrate node['funnies']['migrate']
+  restart_command "touch /srv/funnies/current/tmp/restart.txt"
+  migration_command "bundle exec rake db:migrate"
+  before_migrate do
+    Chef::Log.info "Running bundle install"
+    directory "#{new_resource.path}/shared/vendor_bundle" do
+      owner new_resource.owner
+      group new_resource.group
+      mode '0755'
+    end
+    directory "#{new_resource.release_path}/vendor" do
+      owner new_resource.owner
+      group new_resource.group
+      mode '0755'
+    end
+    link "#{new_resource.release_path}/vendor/bundle" do
+      to "#{new_resource.path}/shared/vendor_bundle"
+    end
+    bundle_without = %w{development test}
+    bundle_without = bundle_without.join(' ')
+    # Check for a Gemfile.lock
+    bundler_deployment = ::File.exists?(::File.join(new_resource.release_path, "Gemfile.lock"))
+    execute "#{bundle_command} install --path=vendor/bundle #{bundler_deployment ? "--deployment " : ""}--without #{bundle_without}" do
+      cwd new_resource.release_path
+      user new_resource.owner
+      environment new_resource.environment
+    end
+  end
 end
+
+# Setup environment file loading in bashrc
+source_env_line = '[ ! -f "$HOME/shared/env" ] || . "$HOME/shared/env"'
+bashrc = Chef::Util::FileEdit.new('/srv/funnies/.bashrc')
+bashrc.insert_line_if_no_match(/\$HOME\/shared\/env/, line)
+bashrc.write_file
 
 # Setup environment variables file
 template '/srv/funnies/shared/env' do
@@ -148,4 +183,17 @@ template '/srv/funnies/shared/env' do
   mode    '0664'
   variables({ env_vars: env_vars })
 end
+
+# Setup nginx config
+template "#{node['nginx']['dir']}/sites-available/funnies.conf" do
+  source      "funnies.conf.erb"
+  owner       "root"
+  group       "root"
+  mode        "0644"
+
+  notifies    :reload, "service[nginx]"
+end
+
+# Enable funnies site
+nginx_site "funnies"
 

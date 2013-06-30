@@ -10,5 +10,6 @@ depends 'application', '2.0.0'
 depends 'build-essential'
 depends 'git'
 depends 'rvm'
+depends 'martinisoft-nginx'
 
 supports 'ubuntu', '>= 12.04'

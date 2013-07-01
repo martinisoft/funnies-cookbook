@@ -20,7 +20,8 @@ suites:
 - name: default
   run_list:
   - recipe[martinisoft-postgresql::default]
-  - recipe[martinisoft-postgresql::server]
+  - recipe[postgresql::server]
+  - recipe[postgresql::contrib]
   - recipe[martinisoft-nginx::default]
   - recipe[funnies::default]
   encrypted_data_bag_secret_key_path: test/integration/default/data_bags/encrypted_data_bag_secret

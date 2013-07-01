@@ -23,4 +23,5 @@ suites:
   - recipe[martinisoft-postgresql::server]
   - recipe[martinisoft-nginx::default]
   - recipe[funnies::default]
+  encrypted_data_bag_secret_key_path: test/integration/default/data_bags/encrypted_data_bag_secret
   attributes: {}

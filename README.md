@@ -41,6 +41,7 @@ Then just run ```kitchen test``` and watch your CPU burn
 * ```default['funnies']['default_database_url']``` - The default database URL if one is not provided
 * ```default['funnies']['revision']``` - Revision to deploy (default is 'master')
 * ```default['funnies']['migrate']``` - Wether to run migrations (default is 'false')
+* ```default['funnies']['ruby_version']``` - Ruby version to install for the app (default is '2.0.0-p247')
 
 ### Recipes
 

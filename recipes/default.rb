@@ -24,11 +24,6 @@ include_recipe "rvm"
 env_vars = begin
              Chef::EncryptedDataBagItem.load("funnies", "env")
            rescue => ex
-             if ex.class == Errno::ENOENT
-               Chef::Log.warn("Could not decrypt data bag! (#{ex})")
-             else
-               Chef::Log.warn("Data bag 'funnies' not found, please create it")
-             end
              {}
            end
 
@@ -47,15 +42,14 @@ end
 
 rvmrc = {
   'rvm_install_on_use_flag'       => 1,
-  'rvm_gemset_create_on_use_flag' => 1,
-  'rvm_trust_rvmrcs_flag'         => 1
+  'rvm_gemset_create_on_use_flag' => 1
 }
 
 script_flags      = '-s stable'
 installer_url     = node['rvm']['installer_url']
 rvm_prefix        = '/srv/funnies'
 rvm_gem_options   = '--no-rdoc --no-ri'
-ruby_version      = '1.9.3-p327'
+ruby_version      = node['funnies']['ruby_version']
 deploy_user_home  = File.join('/', 'srv', 'funnies')
 
 rvmrc_template  rvm_prefix: rvm_prefix,
@@ -80,7 +74,7 @@ end
 execute "install_rvm_ruby_#{ruby_version}" do
   user 'root'
   environment "HOME" => deploy_user_home
-  command "#{deploy_user_home}/.rvm/bin/rvm install #{ruby_version} --patch falcon-gc --autolibs=4"
+  command "#{deploy_user_home}/.rvm/bin/rvm install #{ruby_version} --autolibs=4"
 end
 
 # Does not use autolibs yet, WIP

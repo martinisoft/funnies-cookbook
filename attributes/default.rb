@@ -20,3 +20,4 @@
 default['funnies']['default_database_url'] = 'postgres://funnies@localhost/funnies_production?pool=5&encoding=unicode&min_messages=warning'
 default['funnies']['revision'] = 'master'
 default['funnies']['migrate'] = false
+default['funnies']['ruby_version'] = '2.0.0-p247'

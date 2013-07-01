@@ -154,7 +154,7 @@ application "funnies" do
     bundle_without = bundle_without.join(' ')
     # Check for a Gemfile.lock
     bundler_deployment = ::File.exists?(::File.join(new_resource.release_path, "Gemfile.lock"))
-    execute "#{bundle_command} install --path=vendor/bundle #{bundler_deployment ? "--deployment " : ""}--without #{bundle_without}" do
+    execute "bundle exec install --path=vendor/bundle #{bundler_deployment ? "--deployment " : ""}--without #{bundle_without}" do
       cwd new_resource.release_path
       user new_resource.owner
       environment new_resource.environment

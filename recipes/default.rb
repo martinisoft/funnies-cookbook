@@ -163,10 +163,14 @@ application "funnies" do
 end
 
 # Setup environment file loading in bashrc
-source_env_line = '[ ! -f "$HOME/shared/env" ] || . "$HOME/shared/env"'
-bashrc = Chef::Util::FileEdit.new('/srv/funnies/.bashrc')
-bashrc.insert_line_if_no_match(/\$HOME\/shared\/env/, line)
-bashrc.write_file
+ruby_block "update_bashrc" do
+  block do
+    source_env_line = '[ ! -f "$HOME/shared/env" ] || . "$HOME/shared/env"'
+    bashrc = Chef::Util::FileEdit.new('/srv/funnies/.bashrc')
+    bashrc.insert_line_if_no_match(/\$HOME\/shared\/env/, line)
+    bashrc.write_file
+  end
+end
 
 # Setup environment variables file
 template '/srv/funnies/shared/env' do

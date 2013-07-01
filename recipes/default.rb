@@ -131,8 +131,7 @@ application "funnies" do
     "log" => "log"
   })
 
-  environment env_vars
-  keep_releases 2
+  # environment env_vars
   migrate node['funnies']['migrate']
   restart_command "touch /srv/funnies/current/tmp/restart.txt"
   migration_command "bundle exec rake db:migrate"

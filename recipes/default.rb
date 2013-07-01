@@ -108,7 +108,7 @@ app_dirs.each do |dir|
   end
 end
 
-# Setup database config
+# Defer to default database config if DATABASE_URL does not exist
 env_vars['DATABASE_URL'] ||= node['funnies']['default_database_url']
 
 # Setup funnies application, clone the repo

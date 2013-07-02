@@ -173,10 +173,22 @@ application "funnies" do
     bundle_without = bundle_without.join(' ')
     # Check for a Gemfile.lock
     bundler_deployment = ::File.exists?(::File.join(new_resource.release_path, "Gemfile.lock"))
-    execute "bundle exec install --path=vendor/bundle #{bundler_deployment ? "--deployment " : ""}--without #{bundle_without}" do
+    bash "install_bundle" do
       cwd new_resource.release_path
       user new_resource.owner
-      environment new_resource.environment
+      flags "-l"
+      environment({"HOME" => deploy_user_home, "USER" => new_resource.owner})
+      code "bundle install --path vendor/bundle #{bundler_deployment ? "--deployment " : ""}--without #{bundle_without}"
+    end
+  end
+  before_symlink do
+    Chef::Log.info "Compiling Assets"
+    bash "precompile_assets" do
+      cwd new_resource.release_path
+      user new_resource.owner
+      flags "-l"
+      environment({"HOME" => deploy_user_home, "USER" => new_resource.owner})
+      code "bundle exec rake RAILS_GROUPS=assets assets:precompile"
     end
   end
 end
@@ -184,28 +196,29 @@ end
 # Setup environment file loading in bashrc
 ruby_block "update_bashrc" do
   block do
-    source_env_line = '[ ! -f "$HOME/shared/env" ] || . "$HOME/shared/env"'
-    bashrc = Chef::Util::FileEdit.new('/srv/funnies/.bashrc')
-    bashrc.insert_line_if_no_match(/\$HOME\/shared\/env/, line)
+    source_env_line = '[ ! -f "$HOME/shared/.env" ] || . "$HOME/shared/.env"'
+    bashrc = Chef::Util::FileEdit.new('/srv/funnies/.bash_profile')
+    bashrc.insert_line_if_no_match(/\$HOME\/shared\/env/, source_env_line)
     bashrc.write_file
   end
 end
 
 # Setup environment variables file
-template '/srv/funnies/shared/env' do
+template '/srv/funnies/shared/.env' do
   source  'env.erb'
   owner   'funnies'
   group   'funnies'
   mode    '0664'
-  variables({ env_vars: env_vars })
+  variables({ env_vars: env_vars})
 end
 
 # Setup nginx config
-template "#{node['nginx']['dir']}/sites-available/funnies.conf" do
+template "#{node['nginx']['dir']}/sites-available/funnies" do
   source      "funnies.conf.erb"
   owner       "root"
   group       "root"
   mode        "0644"
+  variables({ passenger_ruby: "/srv/funnies/.rvm/wrappers/default/ruby" })
 
   notifies    :reload, "service[nginx]"
 end

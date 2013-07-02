@@ -125,6 +125,25 @@ file "/srv/funnies/shared/database.yml" do
   action :create
 end
 
+# Setup environment file loading in bashrc
+ruby_block "update_bashrc" do
+  block do
+    source_env_line = '[ ! -f "$HOME/shared/.env" ] || . "$HOME/shared/.env"'
+    bashrc = Chef::Util::FileEdit.new('/srv/funnies/.bash_profile')
+    bashrc.insert_line_if_no_match(/\$HOME\/shared\/env/, source_env_line)
+    bashrc.write_file
+  end
+end
+
+# Setup environment variables file
+template '/srv/funnies/shared/.env' do
+  source  'env.erb'
+  owner   'funnies'
+  group   'funnies'
+  mode    '0664'
+  variables({ env_vars: env_vars })
+end
+
 # Setup funnies application, clone the repo
 application "funnies" do
   path "/srv/funnies"
@@ -186,25 +205,6 @@ application "funnies" do
       code "bundle exec rake RAILS_GROUPS=assets assets:precompile"
     end
   end
-end
-
-# Setup environment file loading in bashrc
-ruby_block "update_bashrc" do
-  block do
-    source_env_line = '[ ! -f "$HOME/shared/.env" ] || . "$HOME/shared/.env"'
-    bashrc = Chef::Util::FileEdit.new('/srv/funnies/.bash_profile')
-    bashrc.insert_line_if_no_match(/\$HOME\/shared\/env/, source_env_line)
-    bashrc.write_file
-  end
-end
-
-# Setup environment variables file
-template '/srv/funnies/shared/.env' do
-  source  'env.erb'
-  owner   'funnies'
-  group   'funnies'
-  mode    '0664'
-  variables({ env_vars: env_vars})
 end
 
 # Setup nginx config

@@ -123,6 +123,13 @@ end
 # Defer to default database config if DATABASE_URL does not exist
 env_vars['DATABASE_URL'] ||= node['funnies']['default_database_url']
 
+# Touch an empty database file to symlink to trick Rails into using DATABASE_URL
+file "/srv/funnies/shared/database.yml" do
+  owner "funnies"
+  group "funnies"
+  action :create
+end
+
 # Setup funnies application, clone the repo
 application "funnies" do
   path "/srv/funnies"
@@ -132,7 +139,7 @@ application "funnies" do
   repository "https://github.com/martinisoft/funnies.git"
   revision "master"
 
-  symlink_before_migrate.clear
+  symlink_before_migrate({"database.yml" => "config/database.yml"})
   create_dirs_before_symlink %w{tmp}
   purge_before_symlink.clear
   symlinks({

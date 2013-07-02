@@ -14,15 +14,23 @@ platforms:
   driver_config:
     box: canonical-ubuntu-12.04
     box_url: http://cloud-images.ubuntu.com/vagrant/precise/current/precise-server-cloudimg-amd64-vagrant-disk1.box
-  run_list: ["recipe[apt]"]
+  run_list:
+  - recipe[apt]
+  - recipe[postgresql::default]
+  - recipe[postgresql::server_debian]
+  - recipe[postgresql::contrib]
+  attributes:
+    postgresql:
+      version: '9.2'
+      enable_pgdg_apt: true
+      config:
+        ssl: false
+      password:
+        postgres: abc321
 
 suites:
 - name: default
   run_list:
-  - recipe[martinisoft-postgresql::default]
-  - recipe[postgresql::server]
-  - recipe[postgresql::contrib]
   - recipe[martinisoft-nginx::default]
   - recipe[funnies::default]
   encrypted_data_bag_secret_key_path: test/integration/default/data_bags/encrypted_data_bag_secret
-  attributes: {}

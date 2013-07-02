@@ -107,7 +107,7 @@ app_dirs = [
   '/srv/funnies/shared/log',
   '/srv/funnies/shared/sessions',
   '/srv/funnies/shared/sockets',
-  '/srv/funnies/shared/system',
+  '/srv/funnies/shared/comics',
   '/srv/funnies/shared/pids'
 ]
 
@@ -136,14 +136,14 @@ application "funnies" do
   create_dirs_before_symlink %w{tmp}
   purge_before_symlink.clear
   symlinks({
-    "system" => "public/system",
+    "comics" => "public/images/comics",
     "pids" => "tmp/pids",
     "sessions" => "tmp/sessions",
     "sockets" => "tmp/sockets",
     "log" => "log"
   })
 
-  # environment env_vars
+  environment env_vars
   migrate node['funnies']['migrate']
   restart_command "touch /srv/funnies/current/tmp/restart.txt"
   migration_command "bundle exec rake db:migrate"

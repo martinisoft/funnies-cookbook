@@ -44,6 +44,14 @@ package 'curl' do
   action :install
 end
 
+package 'libpq-dev' do
+  action :install
+end
+
+package 'postgresql-client' do
+  action :install
+end
+
 rvmrc = {
   'rvm_install_on_use_flag'       => 1,
   'rvm_gemset_create_on_use_flag' => 1

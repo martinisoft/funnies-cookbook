@@ -205,6 +205,16 @@ application "funnies" do
       code "bundle exec rake RAILS_GROUPS=assets assets:precompile"
     end
   end
+  after_symlink do
+    Chef::Log.info "Wheneverizing"
+    bash "precompile_assets" do
+      cwd new_resource.release_path
+      user new_resource.owner
+      flags "-l"
+      environment({"HOME" => deploy_user_home, "USER" => new_resource.owner})
+      code "bundle exec whenever --update-crontab funnies --set environment=production"
+    end
+  end
 end
 
 # Setup nginx config

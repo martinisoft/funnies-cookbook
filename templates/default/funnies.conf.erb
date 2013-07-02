@@ -5,6 +5,7 @@ server {
   access_log /var/log/nginx/funniesapp-access.log;
 
   passenger_enabled on;
+  passenger_ruby <%= @passenger_ruby %>;
 
   location ~ ^/assets/ {
     expires 1y;

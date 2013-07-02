@@ -23,10 +23,13 @@ include_recipe "rvm"
 include_recipe "nodejs::install_from_package"
 
 env_vars = begin
-             Chef::EncryptedDataBagItem.load("funnies", "env")
+             vars = Chef::EncryptedDataBagItem.load("funnies", "env").to_hash
+             vars.delete('id')
+             vars
            rescue => ex
              {}
            end
+
 
 # Setup funnies user
 user "funnies" do

@@ -20,6 +20,7 @@
 include_recipe "git::default"
 include_recipe "build-essential::default"
 include_recipe "rvm"
+include_recipe "nodejs::install_from_package"
 
 env_vars = begin
              Chef::EncryptedDataBagItem.load("funnies", "env")

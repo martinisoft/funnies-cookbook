@@ -11,5 +11,6 @@ depends 'build-essential'
 depends 'git'
 depends 'rvm'
 depends 'nginx'
+depends 'nodejs'
 
 supports 'ubuntu', '>= 12.04'

@@ -165,9 +165,8 @@ application "funnies" do
   })
 
   environment env_vars
-  migrate node['funnies']['migrate']
+  migrate false
   restart_command "touch /srv/funnies/current/tmp/restart.txt"
-  migration_command "~/.rvm/wrappers/default/ruby bundle exec rake db:migrate"
   before_migrate do
     Chef::Log.info "Running bundle install"
     directory "#{new_resource.path}/shared/vendor_bundle" do
@@ -196,6 +195,16 @@ application "funnies" do
     end
   end
   before_symlink do
+    if node['funnies']['migrate']
+      Chef::Log.info "Migrating"
+      bash "rake_db_migrate" do
+        cwd new_resource.release_path
+        user new_resource.owner
+        flags "-l"
+        environment({"HOME" => deploy_user_home, "USER" => new_resource.owner})
+        code "bundle exec rake db:migrate"
+      end
+    end
     Chef::Log.info "Compiling Assets"
     bash "precompile_assets" do
       cwd new_resource.release_path

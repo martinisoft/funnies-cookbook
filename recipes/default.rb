@@ -39,17 +39,12 @@ user "funnies" do
   manage_home true
 end
 
-# Does not come with build-essential in Ubuntu
-package 'curl' do
-  action :install
-end
-
-package 'libpq-dev' do
-  action :install
-end
-
-package 'postgresql-client' do
-  action :install
+# Setup some missing, but needed packages
+dev_packages = %w[curl libpq-dev postgresql-client libxml2-dev libxslt1-dev]
+dev_packages.each do |package|
+  package package do
+    action :install
+  end
 end
 
 rvmrc = {

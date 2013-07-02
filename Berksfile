@@ -6,6 +6,6 @@ metadata
 cookbook 'rvm', github: 'fnichol/chef-rvm', ref: 'master'
 
 group :integration do
-  cookbook 'martinisoft-nginx'
+  cookbook 'martinisoft-nginx', '~> 0.3'
   cookbook 'martinisoft-database_server'
 end

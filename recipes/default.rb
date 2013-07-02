@@ -205,7 +205,7 @@ application "funnies" do
       code "bundle exec rake RAILS_GROUPS=assets assets:precompile"
     end
   end
-  after_symlink do
+  after_restart do
     Chef::Log.info "Wheneverizing"
     bash "precompile_assets" do
       cwd new_resource.release_path

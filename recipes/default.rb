@@ -155,7 +155,7 @@ application "funnies" do
 
   symlink_before_migrate({"database.yml" => "config/database.yml"})
   create_dirs_before_symlink %w{tmp}
-  purge_before_symlink.clear
+  purge_before_symlink %w{log}
   symlinks({
     "comics" => "public/images/comics",
     "pids" => "tmp/pids",

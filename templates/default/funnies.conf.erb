@@ -1,8 +1,13 @@
 server {
   listen 80;
+  listen 443;
   server_name funniesapp.com www.funniesapp.com;
   root /srv/funnies/current/public;
   access_log /var/log/nginx/funniesapp-access.log;
+
+  ssl on;
+  ssl_certificate /etc/nginx/ssl/www_funniesapp_com_combined.crt;
+  ssl_certificate_key /etc/nginx/ssl/marvin.funniesapp.com.key;
 
   passenger_enabled on;
   passenger_ruby <%= @passenger_ruby %>;
@@ -15,3 +20,9 @@ server {
     break;
   }
 }
+
+server {
+  server_name funniesapp.com;
+  return 301 https://www.funniesapp.com$request_uri;
+}
+

@@ -27,15 +27,24 @@ env_vars = begin
              vars.delete('id')
              vars
            rescue => ex
+             Chef::Log.warn("Cannot decrypt data bag! #{ex}")
              {}
            end
 
+app_name          = "funnies"
+app_home          = "/srv/#{app_name}"
+deploy_user_home  = File.join('/', 'srv', app_name)
+shared_home       = "#{deploy_user_home}/shared"
+script_flags      = '-s stable'
+installer_url     = node['rvm']['installer_url']
+rvm_gem_options   = '--no-rdoc --no-ri'
+ruby_version      = node['funnies']['ruby_version']
 
 # Setup funnies user
-user "funnies" do
-  comment "Funnies application"
+user app_name do
+  comment "#{app_name} application"
   shell "/bin/bash"
-  home "/srv/funnies"
+  home deploy_user_home
   manage_home true
 end
 
@@ -52,27 +61,20 @@ rvmrc = {
   'rvm_gemset_create_on_use_flag' => 1
 }
 
-script_flags      = '-s stable'
-installer_url     = node['rvm']['installer_url']
-rvm_prefix        = '/srv/funnies'
-rvm_gem_options   = '--no-rdoc --no-ri'
-ruby_version      = node['funnies']['ruby_version']
-deploy_user_home  = File.join('/', 'srv', 'funnies')
-
-rvmrc_template  rvm_prefix: rvm_prefix,
+rvmrc_template  rvm_prefix: deploy_user_home,
                 rvm_gem_options: rvm_gem_options,
                 rvmrc: rvmrc,
-                user: 'funnies'
+                user: app_home
 
 
-install_rvm     rvm_prefix: rvm_prefix,
+install_rvm     rvm_prefix: deploy_user_home,
                 installer_url: installer_url,
                 script_flags: script_flags,
-                user: 'funnies'
+                user: app_home
 
 # Reset permissions on the rvmrc file
-file "#{rvm_prefix}/.rvmrc" do
-  group "funnies"
+file "#{deploy_user_home}/.rvmrc" do
+  group app_name
 end
 
 # Running this to resolve dependencies and install ruby at the same time
@@ -93,23 +95,23 @@ end
 
 # Set default ruby version
 rvm_default_ruby ruby_version do
-  user "funnies"
+  user app_name
 end
 
 # Setup application directories
 app_dirs = [
-  '/srv/funnies/shared/config',
-  '/srv/funnies/shared/log',
-  '/srv/funnies/shared/sessions',
-  '/srv/funnies/shared/sockets',
-  '/srv/funnies/shared/comics',
-  '/srv/funnies/shared/pids'
+  "#{shared_home}/config",
+  "#{shared_home}/log",
+  "#{shared_home}/sessions",
+  "#{shared_home}/sockets",
+  "#{shared_home}/comics",
+  "#{shared_home}/pids"
 ]
 
 app_dirs.each do |dir|
   directory dir do
-    owner       'funnies'
-    group       'funnies'
+    owner       app_name
+    group       app_name
     mode        '2775'
     recursive   true
   end
@@ -119,9 +121,9 @@ end
 env_vars['DATABASE_URL'] ||= node['funnies']['default_database_url']
 
 # Touch an empty database file to symlink to trick Rails into using DATABASE_URL
-file "/srv/funnies/shared/database.yml" do
-  owner "funnies"
-  group "funnies"
+file "#{shared_home}/database.yml" do
+  owner app_name
+  group app_name
   action :create
 end
 
@@ -129,29 +131,29 @@ end
 ruby_block "update_bashrc" do
   block do
     source_env_line = '[ ! -f "$HOME/shared/.env" ] || . "$HOME/shared/.env"'
-    bashrc = Chef::Util::FileEdit.new('/srv/funnies/.bash_profile')
-    bashrc.insert_line_if_no_match(/\$HOME\/shared\/env/, source_env_line)
+    bashrc = Chef::Util::FileEdit.new("#{deploy_user_home}/.bash_profile")
+    bashrc.insert_line_if_no_match(/\$HOME\/shared\/\.env/, source_env_line)
     bashrc.write_file
   end
 end
 
 # Setup environment variables file
-template '/srv/funnies/shared/.env' do
+template "#{shared_home}/.env" do
   source  'env.erb'
-  owner   'funnies'
-  group   'funnies'
+  owner   app_name
+  group   app_name
   mode    '0664'
   variables({ env_vars: env_vars })
 end
 
 # Setup funnies application, clone the repo
-application "funnies" do
-  path "/srv/funnies"
-  owner "funnies"
-  group "funnies"
+application app_name do
+  path deploy_user_home
+  owner app_name
+  group app_name
 
   repository "https://github.com/martinisoft/funnies.git"
-  revision "master"
+  revision node[app_name]["revision"]
 
   symlink_before_migrate({"database.yml" => "config/database.yml"})
   create_dirs_before_symlink %w{tmp}
@@ -166,7 +168,7 @@ application "funnies" do
 
   environment env_vars
   migrate false
-  restart_command "touch /srv/funnies/current/tmp/restart.txt"
+  restart_command "touch #{deploy_user_home}/current/tmp/restart.txt"
   before_migrate do
     Chef::Log.info "Running bundle install"
     directory "#{new_resource.path}/shared/vendor_bundle" do
@@ -227,16 +229,16 @@ application "funnies" do
 end
 
 # Setup nginx config
-template "#{node['nginx']['dir']}/sites-available/funnies" do
-  source      "funnies.conf.erb"
+template "#{node['nginx']['dir']}/sites-available/#{app_name}" do
+  source      "#{app_name}.conf.erb"
   owner       "root"
   group       "root"
   mode        "0644"
-  variables({ passenger_ruby: "/srv/funnies/.rvm/wrappers/default/ruby" })
+  variables({ passenger_ruby: "#{deploy_user_home}/.rvm/wrappers/default/ruby" })
 
   notifies    :reload, "service[nginx]"
 end
 
 # Enable funnies site
-nginx_site "funnies"
+nginx_site app_name
 

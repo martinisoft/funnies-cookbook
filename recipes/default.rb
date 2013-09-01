@@ -64,13 +64,13 @@ rvmrc = {
 rvmrc_template  rvm_prefix: deploy_user_home,
                 rvm_gem_options: rvm_gem_options,
                 rvmrc: rvmrc,
-                user: app_home
+                user: app_name
 
 
 install_rvm     rvm_prefix: deploy_user_home,
                 installer_url: installer_url,
                 script_flags: script_flags,
-                user: app_home
+                user: app_name
 
 # Reset permissions on the rvmrc file
 file "#{deploy_user_home}/.rvmrc" do

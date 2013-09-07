@@ -1,15 +1,24 @@
 server {
   listen 80;
-  listen 443;
+  listen 443 ssl;
+  server_name funniesapp.com;
+  ssl_certificate /etc/nginx/ssl/www_funniesapp_com_combined.crt;
+  ssl_certificate_key /etc/nginx/ssl/marvin.funniesapp.com.key;
+
+  return 301 https://www.funniespp.com$request_uri;
+}
+
+server {
+  listen 443 ssl;
   server_name www.funniesapp.com;
   root /srv/funnies/current/public;
   access_log /var/log/nginx/funniesapp-access.log;
 
-  ssl on;
   ssl_certificate /etc/nginx/ssl/www_funniesapp_com_combined.crt;
   ssl_certificate_key /etc/nginx/ssl/marvin.funniesapp.com.key;
 
   passenger_enabled on;
+  passenger_set_cgi_param HTTP_X_FORWARDED_PROTO https;
   passenger_ruby <%= @passenger_ruby %>;
 
   location ~ ^/assets/ {
@@ -19,10 +28,5 @@ server {
     add_header ETag "";
     break;
   }
-}
-
-server {
-  server_name funniesapp.com;
-  return 301 https://www.funniesapp.com$request_uri;
 }
 
